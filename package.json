@@ -1,0 +1,26 @@
+{
+  "name": "hotel-booking",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "This project started as a frontend-only application.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AhtnamasAyirpuna/hotel-booking.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AhtnamasAyirpuna/hotel-booking/issues"
+  },
+  "homepage": "https://github.com/AhtnamasAyirpuna/hotel-booking#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.22.1",
+    "firebase-admin": "^12.7.0"
+  }
+}
