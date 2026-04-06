@@ -20,6 +20,7 @@
   "homepage": "https://github.com/AhtnamasAyirpuna/hotel-booking#readme",
   "dependencies": {
     "cors": "^2.8.6",
+    "dotenv": "^17.4.0",
     "express": "^4.22.1",
     "firebase-admin": "^12.7.0"
   }
