@@ -112,7 +112,7 @@ const Navbar = () => {
                         </button>
                     </>
                 ) : (
-                    <button onClick={() => setShowLogin(true)} className="bg-black text-white px-8 py-2.5 rounded-full transition-all duration-500">
+                    <button onClick={() => { setIsMenuOpen(false); setShowLogin(true); }} className="bg-black text-white px-8 py-2.5 rounded-full transition-all duration-500 cursor-pointer">
                         Login
                     </button>
                 )}

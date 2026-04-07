@@ -7,12 +7,12 @@ import { getFirestore } from "firebase/firestore"
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_API_KEY,
-    authDomain: import.meta.env.VITE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_APP_ID,
+    apiKey: "AIzaSyDX_gEgoD8pjlSYTRl-fWkV7Mi0mOgU1As",
+    authDomain: "hotel-booking-capstone-46a56.firebaseapp.com",
+    projectId: "hotel-booking-capstone-46a56",
+    storageBucket: "hotel-booking-capstone-46a56.firebasestorage.app",
+    messagingSenderId: "986420940028",
+    appId: "1:986420940028:web:b6eab30900dae5c8f41b79"
 };
 
 // Initialize Firebase
