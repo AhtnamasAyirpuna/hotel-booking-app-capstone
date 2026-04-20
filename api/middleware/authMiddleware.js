@@ -13,6 +13,7 @@ export const verifyToken = async (req, res, next) => {
         const decodedToken = await admin.auth().verifyIdToken(token);
 
         req.user = decodedToken;
+        console.log("AUTH HEADER:", req.headers.authorization);
 
         next();
     } catch (error) {

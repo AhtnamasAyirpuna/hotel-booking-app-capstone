@@ -1,5 +1,4 @@
-import { db } from "../firebaseAdmin.js";
-import admin from "firebase-admin";
+import pool from "../config/db.js";
 
 export const searchRooms = async (req, res) => {
     try {
@@ -11,45 +10,40 @@ export const searchRooms = async (req, res) => {
             });
         }
 
-        const checkIn = admin.firestore.Timestamp.fromDate(new Date(`${checkInDate}T00:00:00`));
-        const checkOut = admin.firestore.Timestamp.fromDate(new Date(`${checkOutDate}T00:00:00`));
-
-        if (checkIn >= checkOut) {
+        if (new Date(checkInDate) >= new Date(checkOutDate)) {
             return res.status(400).json({
                 message: "Invalid date range"
             });
         }
 
         //get rooms
-        let roomsQuery = db.collection("rooms");
+        let query = "SELECT * FROM rooms";
+        let values = [];
 
-        if (city && city != "all") {
-            roomsQuery = roomsQuery.where("hotel.city", "==", city);
+        if (city && city !== "all") {
+            query += "WHERE hotel->>'city' = $1";
+            values.push(city);
         }
 
-        const roomSnap = await roomsQuery.get();
+        const roomsResult = await pool.query(query, values);
+        const rooms = roomsResult.rows;
 
-        if (roomSnap.empty) {
-            return res.json([]);
-        }
+        if (rooms.length === 0) return res.json([]);
 
-        const rooms = roomSnap.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
-
-        //overlapping bookings
-        const bookingSnap = await db
-            .collection("bookings")
-            .where("checkInDate", "<", checkOut)
-            .where("checkOutDate", ">", checkIn)
-            .get();
-
-        const bookedRoomIds = new Set(
-            bookingSnap.docs.map(doc => doc.data().room.id)
+        //get booked rooms
+        const bookingResult = await pool.query(
+            `
+            SELECT room_id FROM bookings
+            WHERE check_in_date < $1
+            AND check_out_date > $2
+            `,
+            [checkOutDate, checkInDate]
         );
 
-        //filter available rooms
+        const bookedRoomIds = new Set(
+            bookingResult.rows.map(b => b.room_id)
+        );
+
         const availableRooms = rooms.filter(
             room => !bookedRoomIds.has(room.id)
         );
@@ -68,17 +62,17 @@ export const searchRoom = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const docRef = db.collection("rooms").doc(id);
-        const docSnap = await docRef.get();
+        const result = await pool.query(
+            "SELECT * FROM rooms WHERE id = $1",
+            [id]
+        );
 
-        if (!docSnap.exists) {
-            return res.status(404).json({ message: "Room not found" })
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "Room not found" });
         }
 
-        res.json({
-            id: docSnap.id,
-            ...docSnap.data(),
-        });
+        res.json(result.rows[0]);
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Failed to fetch room" });
@@ -96,18 +90,17 @@ export const checkRoomAvailability = async (req, res) => {
             });
         }
 
-        const checkIn = admin.firestore.Timestamp.fromDate(new Date(`${checkInDate}T00:00:00`));
+        const result = await pool.query(
+            `
+             SELECT * FROM bookings
+             WHERE room_id = $1
+             AND check_in_date < $2
+             AND check_out_date > $3
+            `,
+            [id, checkOutDate, checkInDate]
+        );
 
-        const checkOut = admin.firestore.Timestamp.fromDate(new Date(`${checkOutDate}T00:00:00`));
-
-        const bookingSnap = await db
-            .collection("bookings")
-            .where("room", "==", db.collection("rooms").doc(id))
-            .where("checkInDate", "<", checkOut)
-            .where("checkOutDate", ">", checkIn)
-            .get();
-
-        if (!bookingSnap.empty) {
+        if (result.rows.length > 0) {
             return res.json({ available: false });
         }
 

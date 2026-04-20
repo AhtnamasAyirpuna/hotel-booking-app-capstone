@@ -1,7 +1,4 @@
-import { db } from "../firebaseAdmin.js";
-import { createBookingModel } from "../models/booking.js";
-import { checkAvailability } from "../services/bookingService.js";
-import { Timestamp } from "firebase-admin/firestore";
+import pool from "../config/db.js";
 
 export const createBooking = async (req, res) => {
     try {
@@ -12,110 +9,86 @@ export const createBooking = async (req, res) => {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
-        const roomSnap = await db.collection("rooms").doc(roomId).get();
+        const checkIn = new Date(checkInDate);
+        const checkOut = new Date(checkOutDate);
 
-        if (!roomSnap.exists) {
+        if (checkOut <= checkIn) {
+            return res.status(400).json({ message: "invalid date range" });
+        }
+
+        const roomResult = await pool.query(
+            "SELECT * FROM rooms WHERE id = $1",
+            [roomId]
+        );
+
+        if (roomResult.rows.length === 0) {
             return res.status(404).json({ message: "Room not found" });
         }
 
+        const room = roomResult.rows[0];
+
         //before booking check availability
-        let isAvailable;
+        const bookingCheck = await pool.query(
+            `
+            SELECT * FROM bookings
+            WHERE room_id = $1
+            AND check_in_date < $2
+            AND check_out_date > $3
+            `,
+            [roomId, checkOutDate, checkInDate]
+        );
 
-        try {
-            isAvailable = await checkAvailability(
-                roomId,
-                checkInDate,
-                checkOutDate
-            );
-        } catch (err) {
-            if (err.message === "INVALID_DATE_RANGE") {
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid booking dates"
-                });
-            }
-            throw err;
+        if (bookingCheck.rows.length > 0) {
+            return res.status(409).json({ message: "Room not available" });
         }
 
-        if (!isAvailable) {
-            return res.status(409).json({ success: false, message: "Room is not available" });
-        }
+        const nights = Math.ceil(
+            (checkOut - checkIn) / (1000 * 60 * 60 * 24)
+        );
 
-        const start = new Date(`${checkInDate}T00:00:00`);
-        const end = new Date(`${checkOutDate}T00:00:00`);
-        const MS_PER_DAY = 1000 * 60 * 60 * 24;
-        const nights = Math.ceil((end - start) / MS_PER_DAY);
+        const totalPrice = nights * room.price_per_night;
 
-        const { pricePerNight } = roomSnap.data();
-        const totalPrice = nights * pricePerNight;
-
-        const userRef = db.collection("users").doc(userId);
-        const roomRef = db.collection("rooms").doc(roomId);
-
-        const bookingData = createBookingModel({
-            user: userRef,
-            room: roomRef,
-            checkInDate: Timestamp.fromDate(new Date(`${checkInDate}T00:00:00`)),
-            checkOutDate: Timestamp.fromDate(new Date(`${checkOutDate}T00:00:00`)),
-            totalPrice,
-        });
-
-        const bookingRef = await db.collection("bookings").add(bookingData);
+        const result = await pool.query(
+            `
+            INSERT INTO bookings (user_id, room_id, check_in_date, check_out_date, total_price)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING *
+            `,
+            [userId, roomId, checkInDate, checkOutDate, totalPrice]
+        );
 
         res.status(201).json({
             message: "Booking created successfully",
-            bookingId: bookingRef.id,
+            booking: result.rows[0],
         });
 
-    } catch (error) {
-        res.status(500).json({
-            message: error instanceof Error ? error.message : "Unknown error",
-        });
+    } catch (err) {
+        console.error(error);
+        res.status(500).json({ message: "Failed to create booking" });
     }
 };
+
+
 
 export const getMyBookings = async (req, res) => {
     try {
         const userId = req.user.uid;
-        const userRef = db.collection("users").doc(userId);
 
-        const bookingSnap = await db
-            .collection("bookings")
-            .where("user", "==", userRef)
-            .get();
-
-        console.log("Bookings found:", bookingSnap.size)
-
-        const bookings = await Promise.all(
-            bookingSnap.docs.map(async (doc) => {
-                const data = doc.data();
-
-                let roomData = null;
-
-                if (data.room) {
-                    const roomDoc = await data.room.get();
-
-                    roomData = roomDoc.exists
-                        ? { id: roomDoc.id, ...roomDoc.data() }
-                        : null;
-                }
-
-                return {
-                    id: doc.id,
-                    ...data,
-                    checkInDate: data.checkInDate?.toDate().toISOString(),
-                    checkOutDate: data.checkOutDate?.toDate().toISOString(),
-                    room: roomData, // 🔥 populated room
-                };
-            })
+        const result = await pool.query(
+            `
+            SELECT b.*, r.*
+            FROM bookings b
+            JOIN rooms r ON b.room_id = r.id
+            WHERE b.user_id = $1
+            ORDER BY b.created_at DESC
+            `,
+            [userId]
         );
 
-        res.json(bookings);
+        res.json(result.rows);
     } catch (error) {
         console.error(error);
-        res.status(500).json({
-            message: "Failed to fetch bookings"
-        });
+        res.status(500).json({ message: "Failed to fetch bookings" });
     }
 };
 
@@ -124,29 +97,25 @@ export const getBookingById = async (req, res) => {
         const bookingId = req.params.id;
         const userId = req.user.uid;
 
-        const bookingRef = db.collection("bookings").doc(bookingId);
-        const bookingSnap = await bookingRef.get();
+        const result = await pool.query(
+            `
+            SELECT b.*, r.*
+            FROM bookings b
+            JOIN rooms r ON b.room_id = r.id
+            WHERE b.id = $1 AND b.user_id = $2
+            `,
+            [bookingId, userId]
+        );
 
-        //to check if booking exists
-        if (!bookingSnap.exists) {
-            return res.status(404).json({ message: "Booking not found" });
+        if (result.rows.length === 0) {
+            return res.status(500).json({ message: "Booking not found" });
         }
 
-        const booking = bookingSnap.data();
+        res.json(result.rows[0]);
 
-        //to check if booking belongs to the user
-        if (!booking.user || booking.user.id !== userId) {
-            return res.status(403).json({ message: "Access denied" });
-        }
-
-        res.json({
-            id: bookingSnap.id,
-            ...booking,
-        });
     } catch (error) {
-        res.status(500).json({
-            message: error instanceof Error ? error.message : "Server error",
-        });
+        console.error(error);
+        res.status(500).json({ message: "Failed to fetch booking" });
     }
 };
 
@@ -155,27 +124,26 @@ export const deleteBooking = async (req, res) => {
         const userId = req.user.uid;
         const { id } = req.params;
 
-        const bookingRef = db.collection("bookings").doc(id);
-        const bookingSnap = await bookingRef.get();
+        const result = await pool.query(
+            `
+            DELETE FROM bookings
+            WHERE id = $1 AND user_id = $2
+            RETURNING *
+            `,
+            [id, userId]
+        );
 
-        if (!bookingSnap.exists) {
-            return res.status(404).json({ message: "Booking not found" });
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "Booking not found or unauthorized" })
         }
-
-        const booking = bookingSnap.data();
-
-        //must belong to respective user
-        if (!booking.user || booking.user.id !== userId) {
-            return res.status(404).json({ message: "Access denied" });
-        }
-
-        await bookingRef.delete();
 
         res.json({ message: "Booking deleted successfully" });
+
     } catch (error) {
-        res.status(500).json({ message: error instanceof Error ? error.message : "Server error" })
+        console.error(error);
+        res.status(500).json({ message: "Failed to delte booking" });
     }
-}
+};
 
 export const checkRoomAvailability = async (req, res) => {
     try {
@@ -187,32 +155,30 @@ export const checkRoomAvailability = async (req, res) => {
             });
         }
 
-        let isAvailable;
-
-        try {
-            isAvailable = await checkAvailability(
-                roomId,
-                checkInDate,
-                checkOutDate
-            );
-        } catch (err) {
-            if (err.message === "INVALID_DATE_RANGE") {
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid booking dates"
-                });
-            }
-            throw err;
+        if (new Date(checkOutDate) <= new Date(checkInDate)) {
+            return res.status(400).json({
+                message: "Invalid date range"
+            });
         }
 
-        res.status(200).json({
+        const result = await pool.query(
+            `
+            SELECT * FROM bookings
+            WHERE room_id = $1
+            AND check_in_date > $2 
+            AND check_out_date < $3    
+            `,
+            [roomId, checkOutDate, checkInDate]
+        );
+
+        res.json({
             roomId,
-            available: isAvailable
+            available: result.rows.length === 0
         });
+
     } catch (error) {
-        res.status(500).json({
-            message: error instanceof Error ? error.message : "server error"
-        });
+        console.error(error);
+        res.status(500).json({ message: "Failed to check availability" });
     }
 };
 
@@ -237,37 +203,45 @@ export const updateBooking = async (req, res) => {
             });
         }
 
-        const bookingRef = db.collection("bookings").doc(id);
-        const bookingSnap = await bookingRef.get();
 
-        if (!bookingSnap.exists) {
-            return res.status(404).json({ message: "Booking not found" });
-        }
-
-        const booking = bookingSnap.data();
-
-        if (!booking.user || booking.user.id !== userId) {
-            return res.status(403).json({ message: "Unauthorized" });
-        }
-
-        const available = await checkAvailability(
-            booking.room.id,
-            checkInDate,
-            checkOutDate,
-            id
+        const bookingResult = await pool.query(
+            "SELECT * FROM bookings WHERE id = $1 AND user_id = $2",
+            [id, userId]
         );
 
-        if (!available) {
-            return res.status(404).json({ message: "Room not available" });
+        if (bookingResult.rows.length === 0) {
+            return res.status(404).json({ message: "Booking not found or unauthorized" });
         }
 
-        await bookingRef.update({
-            checkInDate: Timestamp.fromDate(new Date(`${checkInDate}T00:00:00`)),
-            checkOutDate: Timestamp.fromDate(new Date(`${checkOutDate}T00:00:00`)),
-            updatedAt: Timestamp.now()
-        });
+        const booking = bookingResult.rows[0];
+
+        const conflictCheck = await pool.query(
+            `
+            SELECT * FROM bookings
+            WHERE room_id = $1
+            AND id != $2
+            AND check_in_date < $3
+            AND check_out_date > $4
+            `,
+            [booking.room_id, id, checkOutDate, checkInDate]
+        );
+
+        if (conflictCheck.rows.length > 0) {
+            return res.status(409).json({ message: "Room not available" });
+        }
+
+        await pool.query(
+            `
+            UPDATE bookings
+            SET check_in_date = $1,
+                check_out_date = $2
+            WHERE id = $3      
+            `,
+            [checkInDate, checkOutDate, id]
+        );
 
         res.json({ message: "Booking updated successfully" });
+
     } catch (error) {
         res.status(500).json({ message: "Failed to update booking" })
     }

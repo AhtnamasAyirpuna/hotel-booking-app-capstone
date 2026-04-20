@@ -7,20 +7,20 @@ const router = express.Router();
 //public - check availability
 router.get("/availability", checkRoomAvailability);
 
-//POST /api/bookings
-router.post("/", verifyToken, createBooking);
-
 //GET my bookings
 router.get("/my", verifyToken, getMyBookings);
 
 //GET /api/bookings/:id
 router.get("/:id", verifyToken, getBookingById);
 
+//POST /api/bookings
+router.post("/", verifyToken, createBooking);
 
 router.put("/:id", verifyToken, updateBooking);
 
-//DELETE booking by id
 router.delete("/:id", verifyToken, deleteBooking);
-
+router.delete("/test", (req, res) => {
+    res.send("DELETE WORKS");
+});
 
 export default router;
