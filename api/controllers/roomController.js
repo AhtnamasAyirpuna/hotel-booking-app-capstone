@@ -1,5 +1,15 @@
 import pool from "../config/db.js";
 
+export const getAllRooms = async (req, res) => {
+    try {
+        const result = await pool.query("SELECT * FROM rooms");
+        res.json(result.rows);
+    } catch (error) {
+        console.error("Fetch rooms error:", error);
+        res.status(500).json({ message: "Failed to fetch rooms" });
+    }
+};
+
 export const searchRooms = async (req, res) => {
     try {
         const { city, checkInDate, checkOutDate } = req.query;
@@ -21,7 +31,7 @@ export const searchRooms = async (req, res) => {
         let values = [];
 
         if (city && city !== "all") {
-            query += "WHERE hotel->>'city' = $1";
+            query += " WHERE hotel->>'city' = $1";
             values.push(city);
         }
 

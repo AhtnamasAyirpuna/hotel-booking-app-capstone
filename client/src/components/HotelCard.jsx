@@ -4,7 +4,7 @@ import { assets } from '../assets'
 const HotelCard = ({ room }) => {
     return (
         <Link to={'/rooms/' + room.id} onClick={() => scrollTo(0, 0)} key={room.id} className='w-full max-w-sm bg-white rounded-xl overflow-hidden shadow-[0px_4px_4px_rgba(0,0,0,0.05)] flex flex-col'>
-            <img src={room.images[0]} alt="" className='w-full h-48 object-cover' />
+            <img src={room.image[0]} alt="" className='w-full h-48 object-cover' />
             <div className='p-4 pt-5 flex flex-col flex-grow'>
                 <div className='flex items-center justify-between'>
                     <p className='font-playfair text-xl font-medium text-gray-800'>{room.hotel.name}</p>

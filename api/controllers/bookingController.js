@@ -76,7 +76,15 @@ export const getMyBookings = async (req, res) => {
 
         const result = await pool.query(
             `
-            SELECT b.*, r.*
+            SELECT 
+                b.id AS booking_id,
+                b.check_in_date,
+                b.check_out_date,
+                b.total_price,
+                r.id AS room_id,
+                r.address,
+                r.image,
+                r.hotel
             FROM bookings b
             JOIN rooms r ON b.room_id = r.id
             WHERE b.user_id = $1
@@ -85,7 +93,24 @@ export const getMyBookings = async (req, res) => {
             [userId]
         );
 
-        res.json(result.rows);
+        const bookings = result.rows.map(row => ({
+            id: row.booking_id,
+
+            checkInDate: row.check_in_date,
+            checkOutDate: row.check_out_date,
+            totalPrice: row.total_price,
+
+            room: {
+                id: row.room_id,
+                address: row.address,
+                image: row.image,
+                amenities: row.amenities,
+                pricePerNight: row.price_per_night,
+                hotel: row.hotel
+            }
+        }))
+
+        res.json(bookings);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Failed to fetch bookings" });
@@ -165,8 +190,8 @@ export const checkRoomAvailability = async (req, res) => {
             `
             SELECT * FROM bookings
             WHERE room_id = $1
-            AND check_in_date > $2 
-            AND check_out_date < $3    
+            AND check_in_date < $2 
+            AND check_out_date > $3    
             `,
             [roomId, checkOutDate, checkInDate]
         );
@@ -203,7 +228,6 @@ export const updateBooking = async (req, res) => {
             });
         }
 
-
         const bookingResult = await pool.query(
             "SELECT * FROM bookings WHERE id = $1 AND user_id = $2",
             [id, userId]
@@ -230,17 +254,35 @@ export const updateBooking = async (req, res) => {
             return res.status(409).json({ message: "Room not available" });
         }
 
+        const roomResult = await pool.query(
+            "SELECT price_per_night FROM rooms WHERE id = $1",
+            [booking.room_id]
+        );
+
+        const room = roomResult.rows[0];
+
+        if (roomResult.rows.length === 0) {
+            return res.status(404).json({ message: "Room not found" });
+        }
+
+        const nights = Math.ceil(
+            (checkOut - checkIn) / (1000 * 60 * 60 * 24)
+        );
+
+        const totalPrice = nights * room.price_per_night;
+
         await pool.query(
             `
             UPDATE bookings
             SET check_in_date = $1,
-                check_out_date = $2
-            WHERE id = $3      
+                check_out_date = $2,
+                total_price = $3
+            WHERE id = $4      
             `,
-            [checkInDate, checkOutDate, id]
+            [checkInDate, checkOutDate, totalPrice, id]
         );
 
-        res.json({ message: "Booking updated successfully" });
+        res.json({ message: "Booking updated successfully", totalPrice });
 
     } catch (error) {
         res.status(500).json({ message: "Failed to update booking" })

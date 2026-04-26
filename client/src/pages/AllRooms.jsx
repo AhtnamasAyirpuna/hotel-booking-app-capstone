@@ -18,25 +18,16 @@ const AllRooms = () => {
     useEffect(() => {
         const fetchRooms = async () => {
             try {
-                setLoading(true);
+                let url = `${API_URL}/api/rooms`;
 
-                if (city && checkInDate && checkOutDate) {
-                    const query = new URLSearchParams({
-                        city,
-                        checkInDate,
-                        checkOutDate,
-                    }).toString();
-
-                    const res = await fetch(`${API_URL}/api/rooms/search?${query}`);
-
-                    const data = await res.json()
-                    setRooms(data)
+                if (checkInDate && checkOutDate) {
+                    url = `${API_URL}/api/rooms/search?city=${city}&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`
                 }
-                else {
-                    const res = await fetch(`${API_URL}/api/rooms`);
-                    const data = await res.json();
-                    setRooms(data);
-                }
+
+                const res = await fetch(url);
+                const data = await res.json()
+                setRooms(data);
+                console.log("Fetching:", url);
             } catch (error) {
                 console.error("Error loading rooms:", error);
             } finally {
@@ -45,7 +36,7 @@ const AllRooms = () => {
         };
 
         fetchRooms();
-    }, [city, checkInDate, checkOutDate, API_URL]);
+    }, [API_URL, city, checkInDate, checkOutDate]);
 
     if (loading) {
         return <p className='pt-40 text-center'>Loading rooms...</p>
@@ -66,7 +57,7 @@ const AllRooms = () => {
                 {rooms.map((room) => (
                     <div key={room.id} className='flex flex-col md:flex-row items-start py-10 gap-6 border-b border-gray-300 last:border-0'>
                         <img onClick={() => { navigate(`/rooms/${room.id}`); scrollTo(0, 0) }}
-                            src={room.images[0]} alt="hotel-img" title='View Room Details' className='max-h-65 md:w-1/2 rounded-xl shadow-lg object-cover cursor-pointer' />
+                            src={room.image[0]} alt="hotel-img" title='View Room Details' className='max-h-65 md:w-1/2 rounded-xl shadow-lg object-cover cursor-pointer' />
                         <div className='md:w-1/2 flex flex-col gap-2'>
                             <p className='text-gray-500'>{room.hotel.city}</p>
                             <p onClick={() => { navigate(`/rooms/${room.id}`); scrollTo(0, 0) }} className='text-gray-800 text-3xl font-playfair cursor-pointer'>{room.hotel.name}</p>
@@ -84,7 +75,7 @@ const AllRooms = () => {
                                 ))}
                             </div>
                             {/* Room Price per Night */}
-                            <p className='text-xl font-medium text-gray-700'>${room.pricePerNight} /night</p>
+                            <p className='text-xl font-medium text-gray-700'>${room.price_per_night} /night</p>
                         </div>
                     </div>
                 ))}
