@@ -11,6 +11,7 @@ export default function SignUpModal({ onClose, switchToLogin }) {
 
     const handleSignUp = async (e) => {
         e.preventDefault();
+        setError("");
 
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -21,7 +22,12 @@ export default function SignUpModal({ onClose, switchToLogin }) {
                 role: "user",
                 createdAt: serverTimestamp(),
             });
+
+            setEmail("");
+            setPassword("");
+
             onClose();
+
         } catch (err) {
             if (err.code === "auth/weak-password") {
                 setError("Password should be at least 6 characters.");

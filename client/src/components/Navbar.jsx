@@ -74,7 +74,7 @@ const Navbar = () => {
                         <NavLink to="/my-bookings" className={`${isScrolled ? "text-black" : "text-white"} transition-all duration-500`}>
                             My Bookings
                         </NavLink>
-                        <button onClick={() => signOut(auth)} className={`${isScrolled ? "text-black" : "text-white"} transition-all duration-500`}>
+                        <button onClick={() => { signOut(auth); setShowLogin(false); setShowSignup(false) }} className={`${isScrolled ? "text-black" : "text-white"} transition-all duration-500`}>
                             Logout
                         </button>
                     </>
@@ -107,7 +107,7 @@ const Navbar = () => {
                         <a href="/my-bookings" onClick={() => setIsMenuOpen(false)}>
                             My Bookings
                         </a>
-                        <button onClick={() => signOut(auth)} className="text-white-500">
+                        <button onClick={() => { signOut(auth); setIsMenuOpen(false); setShowLogin(false); setShowSignup(false) }} className="text-white-500">
                             Logout
                         </button>
                     </>
@@ -117,18 +117,25 @@ const Navbar = () => {
                     </button>
                 )}
             </div>
-            {showLogin && (<LoginModal onClose={() => setShowLogin(false)} switchToSignup={() => {
-                setShowLogin(false);
-                setShowSignup(true);
-            }}
-            />
+
+            {!currentUser && showLogin && (
+                <LoginModal
+                    onClose={() => setShowLogin(false)}
+                    switchToSignup={() => {
+                        setShowLogin(false);
+                        setShowSignup(true);
+                    }}
+                />
             )}
 
-            {showSignup && (<SignUpModal onClose={() => setShowSignup(false)} switchToLogin={() => {
-                setShowSignup(false);
-                setShowLogin(true);
-            }}
-            />
+            {!currentUser && showSignup && (
+                <SignUpModal
+                    onClose={() => setShowSignup(false)}
+                    switchToLogin={() => {
+                        setShowSignup(false);
+                        setShowLogin(true);
+                    }}
+                />
             )}
         </nav>
     );
