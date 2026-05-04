@@ -100,6 +100,12 @@ export const checkRoomAvailability = async (req, res) => {
             });
         }
 
+        if (new Date(checkOutDate) <= new Date(checkInDate)) {
+            return res.status(400).json({
+                message: "Invalid date range"
+            });
+        }
+
         const result = await pool.query(
             `
              SELECT * FROM bookings

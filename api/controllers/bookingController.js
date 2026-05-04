@@ -63,13 +63,13 @@ export const createBooking = async (req, res) => {
         });
 
     } catch (err) {
-        console.error(error);
+        console.error(err);
         res.status(500).json({ message: "Failed to create booking" });
     }
 };
 
 
-
+//recheck this
 export const getMyBookings = async (req, res) => {
     try {
         const userId = req.user.uid;
@@ -84,7 +84,9 @@ export const getMyBookings = async (req, res) => {
                 r.id AS room_id,
                 r.address,
                 r.image,
-                r.hotel
+                r.hotel,
+                r.amenities,
+                r.price_per_night
             FROM bookings b
             JOIN rooms r ON b.room_id = r.id
             WHERE b.user_id = $1
