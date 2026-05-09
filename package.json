@@ -20,11 +20,15 @@
   },
   "homepage": "https://github.com/AhtnamasAyirpuna/hotel-booking#readme",
   "dependencies": {
+    "axios": "^1.16.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.0",
     "express": "^4.22.1",
     "firebase-admin": "^12.7.0",
-    "pg": "^8.20.0"
+    "leaflet": "^1.9.4",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.20.0",
+    "react-leaflet": "^5.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

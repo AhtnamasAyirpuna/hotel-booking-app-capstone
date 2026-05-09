@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { assets, facilityIcons } from '../assets'
 import { getAuth } from 'firebase/auth'
+import MapView from "../components/MapView";
 
 const RoomDetails = () => {
     const { id } = useParams();
@@ -147,7 +148,7 @@ const RoomDetails = () => {
                     </div>
                 </div>
                 {/* Room Price */}
-                <p className='text-2xl font-medium'>${room.pricePerNight}/night</p>
+                <p className='text-2xl font-medium'>${room.price_per_night}/night</p>
             </div>
             {/* Check in check out form */}
             <form onSubmit={handleBooking} className='flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.15)] p-6 rounded-xl mx-auto mt-16 max-w-6xl'>
@@ -170,7 +171,13 @@ const RoomDetails = () => {
                     {checking ? "Checking..." : "Book now"}
                 </button>
             </form>
-
+            <div className='mt-10'>
+                <MapView
+                    lat={room.latitude}
+                    lng={room.longitude}
+                    title={room.address}
+                />
+            </div>
             <div className='max-w-3xl border-y border-gray-300 my-15 py-10 text-gray-500'>
                 The rooms displayed are subject to availability and may change without prior notice. Availability is determined at the time of booking confirmation, and we encourage guests to complete their reservations promptly to secure their preferred accommodation.
             </div>
