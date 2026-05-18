@@ -1,25 +1,51 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../firebase";
+import { auth, db, storage } from "../firebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { createPortal } from "react-dom";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 
 export default function SignUpModal({ onClose, switchToLogin }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [profileImage, setProfileImage] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const handleSignUp = async (e) => {
         e.preventDefault();
         setError("");
+        setLoading(true);
+
+        if (profileImage && profileImage.size > 2 * 1024 * 1024) {
+            setError("Image must be under 2MB");
+            setLoading(false);
+            return;
+        }
 
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
+            let imageUrl =
+                "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+            if (profileImage) {
+                const imageRef = ref(
+                    storage,
+                    `profilePictures/${user.uid}/${Date.now()}-${profileImage.name}`
+                );
+
+                await uploadBytes(imageRef, profileImage);
+
+                imageUrl = await getDownloadURL(imageRef);
+            }
+
             await setDoc(doc(db, "users", user.uid), {
                 email: user.email,
                 role: "user",
+                profileImage: imageUrl,
                 createdAt: serverTimestamp(),
             });
 
@@ -37,6 +63,8 @@ export default function SignUpModal({ onClose, switchToLogin }) {
             } else {
                 setError("Sign up failed. Please try again");
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -51,6 +79,12 @@ export default function SignUpModal({ onClose, switchToLogin }) {
                     <h2 className="text-2xl font-bold mb-9 text-center text-gray-800">Create Account</h2>
 
                     {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setProfileImage(e.target.files[0])}
+                        className="mb-4"
+                    />
 
                     {/* EMAIL FIELD */}
                     <div className="flex items-center my-2 border bg-indigo-500/5 border-gray-500/10 rounded gap-1 pl-2">
@@ -85,9 +119,10 @@ export default function SignUpModal({ onClose, switchToLogin }) {
 
                     <button
                         type="submit"
+                        disabled={loading}
                         className="w-full mb-3 bg-indigo-500 hover:bg-indigo-600/90 transition py-2.5 rounded text-white font-medium"
                     >
-                        Sign Up
+                        {loading ? "Creating account..." : "Sign up"}
                     </button>
 
                     <p className="text-center mt-4">

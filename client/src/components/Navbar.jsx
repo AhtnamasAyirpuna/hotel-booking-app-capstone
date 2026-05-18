@@ -37,17 +37,6 @@ const Navbar = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, [location.pathname]);
 
-    useEffect(() => {
-        if (currentUser) {
-            currentUser.getIdToken()
-                .then((idToken) => {
-                    console.log("User ID Token:", idToken);
-                    // You can also store it in state or send it to backend here
-                })
-                .catch(err => console.error("Error getting ID token:", err));
-        }
-    }, [currentUser]);
-
     return (
         <nav className={`fixed top-0 left-0 w-full flex items-center justify-between px-4 md:px-16 lg:px-24 xl:px-32 transition-all duration-500 z-50 ${isScrolled ? "bg-white/80 shadow-md text-gray-700 backdrop-blur-lg py-3 md:py-4" : "py-4 md:py-6"}`}>
 
@@ -71,6 +60,7 @@ const Navbar = () => {
             <div className="hidden md:flex items-center gap-4">
                 {currentUser ? (
                     <>
+                        <img src={currentUser.profileImage || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} alt="profile" className='w-10 h-10 rounded-full object-cover border border-gray-300' />
                         <NavLink to="/my-bookings" className={`${isScrolled ? "text-black" : "text-white"} transition-all duration-500`}>
                             My Bookings
                         </NavLink>
@@ -87,7 +77,17 @@ const Navbar = () => {
 
             {/* Mobile Menu Button */}
             <div className="flex items-center gap-3 md:hidden">
-                <img onClick={() => setIsMenuOpen(!isMenuOpen)} src={assets.menu} alt="" className={`${isScrolled && "invert"} h-4`} />
+                {currentUser && (
+                    <img
+                        src={
+                            currentUser.profileImage ||
+                            "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                        }
+                        alt="profile"
+                        className="w-9 h-9 rounded-full object-cover border border-gray-300"
+                    />
+                )}
+                <img onClick={() => setIsMenuOpen(!isMenuOpen)} src={assets.menu} alt="menu" className={`${isScrolled && "invert"} h-4`} />
             </div>
 
             {/* Mobile Menu */}
@@ -104,9 +104,10 @@ const Navbar = () => {
 
                 {currentUser ? (
                     <>
-                        <a href="/my-bookings" onClick={() => setIsMenuOpen(false)}>
+
+                        <Link to="/my-bookings" onClick={() => setIsMenuOpen(false)}>
                             My Bookings
-                        </a>
+                        </Link>
                         <button onClick={() => { signOut(auth); setIsMenuOpen(false); setShowLogin(false); setShowSignup(false) }} className="text-white-500">
                             Logout
                         </button>
