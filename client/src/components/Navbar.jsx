@@ -60,7 +60,7 @@ const Navbar = () => {
             <div className="hidden md:flex items-center gap-4">
                 {currentUser ? (
                     <>
-                        <img src={currentUser.profileImage || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} alt="profile" className='w-10 h-10 rounded-full object-cover border border-gray-300' />
+                        <img src={currentUser?.profile_image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} alt="profile" className='w-10 h-10 rounded-full object-cover border border-gray-300' />
                         <NavLink to="/my-bookings" className={`${isScrolled ? "text-black" : "text-white"} transition-all duration-500`}>
                             My Bookings
                         </NavLink>
@@ -80,7 +80,7 @@ const Navbar = () => {
                 {currentUser && (
                     <img
                         src={
-                            currentUser.profileImage ||
+                            currentUser?.profile_image ||
                             "https://cdn-icons-png.flaticon.com/512/149/149071.png"
                         }
                         alt="profile"

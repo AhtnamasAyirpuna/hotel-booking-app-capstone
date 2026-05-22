@@ -8,7 +8,7 @@ const MapView = ({ lat, lng, title }) => {
             center={[lat, lng]}
             zoom={13}
             scrollWheelZoom={false}
-            className="w-full h-[300px] rounded-xl"
+            className="w-full h-[300px] rounded-xl z-0"
         >
             <TileLayer
                 attribution='&copy; OpenStreetMap contributors'

@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db, storage } from "../firebase";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { auth, storage } from "../firebase";
 import { createPortal } from "react-dom";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
 
 export default function SignUpModal({ onClose, switchToLogin }) {
     const [email, setEmail] = useState("");
@@ -42,17 +40,29 @@ export default function SignUpModal({ onClose, switchToLogin }) {
                 imageUrl = await getDownloadURL(imageRef);
             }
 
-            await setDoc(doc(db, "users", user.uid), {
-                email: user.email,
-                role: "user",
-                profileImage: imageUrl,
-                createdAt: serverTimestamp(),
+            const token = await user.getIdToken();
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    email: user.email,
+                    profileImage: imageUrl,
+                }),
             });
+
+            if (!response.ok) {
+                throw new Error("Failed to save user profile");
+            }
 
             setEmail("");
             setPassword("");
 
             onClose();
+            window.location.reload();
 
         } catch (err) {
             if (err.code === "auth/weak-password") {
@@ -70,7 +80,7 @@ export default function SignUpModal({ onClose, switchToLogin }) {
 
     // using create portal cause i want the modal to stay in centre at every page
     return createPortal(
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
+        <div className="fixed inset-0 z-[9999] bg-black/50 flex justify-center items-center">
             <div className="rounded-xl">
                 <form
                     onSubmit={handleSignUp}

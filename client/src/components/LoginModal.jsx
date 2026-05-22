@@ -25,7 +25,7 @@ export default function LoginModal({ onClose, switchToSignup }) {
 
     // using create portal cause i want the modal to stay in centre at every page
     return createPortal(
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
+        <div className="fixed inset-0 z-[9999] bg-black/50 flex justify-center items-center">
             <div className="rounded-xl">
                 <form
                     onSubmit={handleLogin}
