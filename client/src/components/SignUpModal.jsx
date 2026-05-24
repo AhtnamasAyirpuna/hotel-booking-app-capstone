@@ -3,6 +3,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, storage } from "../firebase";
 import { createPortal } from "react-dom";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { assets } from "../assets";
 
 export default function SignUpModal({ onClose, switchToLogin }) {
     const [email, setEmail] = useState("");
@@ -81,20 +82,30 @@ export default function SignUpModal({ onClose, switchToLogin }) {
     // using create portal cause i want the modal to stay in centre at every page
     return createPortal(
         <div className="fixed inset-0 z-[9999] bg-black/50 flex justify-center items-center">
-            <div className="rounded-xl">
+            <div className="rounded-xl relative">
                 <form
                     onSubmit={handleSignUp}
                     className="bg-white text-gray-500 max-w-[340px] w-full mx-4 md:p-6 p-4 py-8 text-left text-sm rounded-xl shadow-[0px_0px_10px_0px] shadow-black/10"
                 >
+                    <button type="button" onClick={onClose} className="absolute top-3 right-0 p-1 hover:bg-gray-100 rounded-full transition">
+                        <img src={assets.close} alt="close" className="w-4 h-4" />
+                    </button>
                     <h2 className="text-2xl font-bold mb-9 text-center text-gray-800">Create Account</h2>
 
                     {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setProfileImage(e.target.files[0])}
-                        className="mb-4"
-                    />
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-600 mb-2">
+                            Profile Picture
+                        </label>
+
+                        <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-4 cursor-pointer hover: border-indigo-400 transition bg-indigo-500/5">
+                            <input type="file" accept="image/*" onChange={(e) => setProfileImage(e.target.files[0])} className="hidden" />
+                            <img src={profileImage ? URL.createObjectURL(profileImage) : assets.upload || assets.imagePlaceholder
+                            } alt="upload preview" className="w-14 h-14 object-cover rounded-full mb-2" />
+
+                            <p className="text-xs text-gray-500 text-center">{profileImage ? profileImage.name : "Click to upload image"}</p>
+                        </label>
+                    </div>
 
                     {/* EMAIL FIELD */}
                     <div className="flex items-center my-2 border bg-indigo-500/5 border-gray-500/10 rounded gap-1 pl-2">

@@ -8,11 +8,9 @@ const Hero = () => {
     const [city, setCity] = useState("");
     const [checkInDate, setCheckInDate] = useState("");
     const [checkOutDate, setCheckOutDate] = useState("");
-    const [error, setError] = useState("");
 
     const handleSearch = (e) => {
         e.preventDefault();
-        setError("");
 
         if (!checkInDate || !checkOutDate) {
             alert("Please select check-in and check-out dates")
@@ -23,7 +21,7 @@ const Hero = () => {
         const checkOut = new Date(checkOutDate);
 
         if (checkOut <= checkIn) {
-            setError("Invalid date range. Check out must be after check in.");
+            alert("Invalid date range. Check out must be after check in.");
             return;
         }
 
@@ -39,11 +37,6 @@ const Hero = () => {
                 your ideal stay in just a few clicks</p>
 
             <form onSubmit={handleSearch} className='bg-white text-gray-500 rounded-lg px-6 py-4 mt-8 flex flex-col md:flex-row max-md:items-start gap-4 max-md:mx-auto'>
-                {error && (
-                    <p className='text-red-500 text-sm mt-4'>
-                        {error}
-                    </p>
-                )}
                 <div>
                     <div className='flex items-center gap-2'>
                         <img src={assets.location} alt="" className='h-4' />

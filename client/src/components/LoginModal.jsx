@@ -2,6 +2,7 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { createPortal } from "react-dom";
+import { assets } from "../assets";
 
 export default function LoginModal({ onClose, switchToSignup }) {
     const [email, setEmail] = useState("");
@@ -26,11 +27,14 @@ export default function LoginModal({ onClose, switchToSignup }) {
     // using create portal cause i want the modal to stay in centre at every page
     return createPortal(
         <div className="fixed inset-0 z-[9999] bg-black/50 flex justify-center items-center">
-            <div className="rounded-xl">
+            <div className="rounded-xl relative">
                 <form
                     onSubmit={handleLogin}
                     className="bg-white text-gray-500 max-w-[340px] w-full mx-4 md:p-6 p-4 py-8 text-left text-sm rounded-xl shadow-[0px_0px_10px_0px] shadow-black/10"
                 >
+                    <button type="button" onClick={onClose} className="absolute top-3 right-0 p-1 hover:bg-gray-100 rounded-full transition">
+                        <img src={assets.close} alt="close" className="w-4 h-4" />
+                    </button>
                     <h2 className="text-2xl font-bold mb-9 text-center text-gray-800">Welcome Back</h2>
 
                     {error && <p className="text-red-500 text-center mb-4">{error}</p>}

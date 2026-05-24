@@ -60,6 +60,11 @@ const RoomDetails = () => {
 
             const availabilityData = await availabilityRes.json();
 
+            if (!availabilityRes.ok) {
+                alert(availabilityData.message || "Error checking availability");
+                return;
+            }
+
             if (!availabilityData.available) {
                 alert("Room is not available for selected dates");
                 return;
@@ -123,21 +128,26 @@ const RoomDetails = () => {
             </div>
             {/* Room Images */}
             <div className='flex flex-col lg:flex-row mt-6 gap-6'>
+                {/*Main Image */}
                 <div className='lg:w-1/2 w-full'>
                     <img src={mainImage || "https://placehold.co/600x400?text=No+Image"} alt="Room Image" onError={(e) => {
                         e.target.src = "https://placehold.co/600x400?text=Image+Unavailable";
-                    }} className='w-full rounded-xl shadow-lg object-cover' />
+                    }} className='block w-full h-full max-h-[420px] min-h-[420px] rounded-xl shadow-lg object-cover' />
                 </div>
-                <div className='grid grid-cols-2 gap-4 lg:w-1/2 w-full'>
-                    {room?.image.length > 1 && room.image.map((image, index) => (
-                        <img onClick={() => setMainImage(image)}
-                            key={index} src={image} alt="Room Image"
-                            onError={(e) => {
-                                e.target.src =
-                                    "https://placehold.co/300x200?text=Unavailable";
-                            }}
-                            className={`w-full rounded-xl shadow-md object-cover cursor-pointer ${mainImage === image && 'outline-3 outline-orange-500'}`} />
-                    ))}
+                {/*Thumbnail grid*/}
+                <div className='grid grid-cols-2 gap-4 lg:w-1/2 w-full h-[420px]'>
+                    {room?.image.length > 1 &&
+                        room.image.map((image, index) => (
+                            <div key={index} onClick={() => setMainImage(image)} className={`overflow-hidden rounded-xl cursor-pointer shadow-md border-2 transition-all duration-200
+                                ${mainImage === image ? "border-orange-500" : "border-transparent"}`}>
+                                <img src={image} alt="Room Image"
+                                    onError={(e) => {
+                                        e.target.src =
+                                            "https://placehold.co/300x200?text=Unavailable";
+                                    }}
+                                    className={`block w-full h-full object-cover hover:scale-105 transition-transform duration-300`} />
+                            </div>
+                        ))}
                 </div>
             </div>
             {/* Room Highlights */}
