@@ -42,7 +42,7 @@ const Hero = () => {
                         <img src={assets.location} alt="" className='h-4' />
                         <label htmlFor="destinationInput">Destination</label>
                     </div>
-                    <select value={city} onChange={(e) => setCity(e.target.value)} className=" rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none" placeholder="All" required >
+                    <select id="destinationInput" name="destination" value={city} onChange={(e) => setCity(e.target.value)} className=" rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none" required >
                         <option value="all">All destinations</option>
                         {cities.map((city, index) => (
                             <option value={city} key={index}>{city}</option>
@@ -55,7 +55,7 @@ const Hero = () => {
                         <img src={assets.calendar} alt="" className='h-4' />
                         <label htmlFor="checkIn">Check in</label>
                     </div>
-                    <input id="checkIn" type="date" value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} className="rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none" />
+                    <input id="checkIn" name="checkIn" type="date" value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} className="rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none" />
                 </div>
 
                 <div>
@@ -63,7 +63,7 @@ const Hero = () => {
                         <img src={assets.calendar} alt="" className='h-4' />
                         <label htmlFor="checkOut">Check out</label>
                     </div>
-                    <input onChange={(e) => setCheckOutDate(e.target.value)} value={checkOutDate} id="checkOut" type="date" className=" rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none" />
+                    <input id="checkOut" name="checkOut" onChange={(e) => setCheckOutDate(e.target.value)} value={checkOutDate} id="checkOut" type="date" className=" rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none" />
                 </div>
 
                 <button className='flex items-center justify-center gap-1 rounded-md bg-black py-3 px-4 text-white my-auto cursor-pointer max-md:w-full max-md:py-1' >

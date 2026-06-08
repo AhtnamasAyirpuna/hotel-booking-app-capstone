@@ -173,12 +173,12 @@ const RoomDetails = () => {
 
                     <div className='flex flex-col'>
                         <label htmlFor="checkInDate" className='font-medium'>Check-In</label>
-                        <input type="date" value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required />
+                        <input name="checkInDate" id="checkInDate" type="date" value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required />
                     </div>
                     <div className='w-px h-15 bg-gray-300/70 max-md:hidden'></div>
                     <div className='flex flex-col'>
                         <label htmlFor="checkOutDate" className='font-medium'>Check-Out</label>
-                        <input type="date" value={checkOutDate} onChange={(e) => setCheckOutDate(e.target.value)} className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required />
+                        <input name="checkOutDate" id="checkOutDate" type="date" value={checkOutDate} onChange={(e) => setCheckOutDate(e.target.value)} className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required />
                     </div>
                     <div className='w-px h-15 bg-gray-300/70 max-md:hidden'></div>
                 </div>

@@ -189,15 +189,22 @@ const MyBookings = () => {
 
                     <div className="bg-white p-6 rounded w-80">
 
-                        <h3 className="font-medium mb-3">Change Dates</h3>
+                        <h3 className="font-medium mb-3 text-center">Change Dates</h3>
+
+                        <label htmlFor="newCheckIn">Check-In Date</label>
 
                         <input
+                            id="newCheckIn"
+                            name="newCheckIn"
                             type="date"
                             onChange={(e) => setNewCheckIn(e.target.value)}
                             className="border p-2 w-full mb-3"
                         />
 
+                        <label htmlFor="newCheckOut">Check-Out Date</label>
                         <input
+                            id="newCheckOut"
+                            name="newCheckOut"
                             type="date"
                             onChange={(e) => setNewCheckOut(e.target.value)}
                             className="border p-2 w-full mb-4"
