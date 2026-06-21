@@ -6,12 +6,11 @@ import { useNavigate } from 'react-router-dom';
 const FeaturedDestination = () => {
     const [rooms, setRooms] = useState([]);
     const navigate = useNavigate();
-    const API_URL = import.meta.env.VITE_API_URL || "";
 
     useEffect(() => {
         const fetchRooms = async () => {
             try {
-                const res = await fetch(`${API_URL}/api/rooms`);
+                const res = await fetch(`api/rooms`);
                 const data = await res.json();
                 setRooms(data.slice(0, 4));
             } catch (error) {
@@ -19,7 +18,7 @@ const FeaturedDestination = () => {
             }
         };
         fetchRooms();
-    }, [API_URL]);
+    }, []);
 
     return (
         <div className='flex flex-col items-center px-6 md:px-16 lg:px-24 bg-slate-50 py-20'>

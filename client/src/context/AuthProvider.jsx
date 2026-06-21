@@ -18,22 +18,10 @@ export function AuthProvider({ children }) {
             try {
                 const token = await user.getIdToken();
 
-                /* const res = await fetch(
-                     `${import.meta.env.VITE_API_URL}/api/users/me`,
-                     {
-                         headers: {
-                             Authorization: `Bearer ${token}`,
-                         },
-                     }
-                 );
- 
-                 const userData = await res.json();*/
-                //delete
-
                 console.log("TOKEN:", token);
 
                 const res = await fetch(
-                    `${import.meta.env.VITE_API_URL}/api/users/me`,
+                    `api/users/me`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,

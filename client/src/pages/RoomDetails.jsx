@@ -12,12 +12,11 @@ const RoomDetails = () => {
     const [checkInDate, setCheckInDate] = useState("");
     const [checkOutDate, setCheckOutDate] = useState("");
     const [checking, setChecking] = useState(false);
-    const API_URL = import.meta.env.VITE_API_URL || "";
 
     useEffect(() => {
         const fetchRoom = async () => {
             try {
-                const res = await fetch(`${API_URL}/api/rooms/${id}`);
+                const res = await fetch(`api/rooms/${id}`);
                 if (!res.ok) {
                     throw new Error("Room not found");
                 }
@@ -32,7 +31,7 @@ const RoomDetails = () => {
             }
         };
         fetchRoom();
-    }, [id, API_URL]);
+    }, [id]);
 
     if (loading) {
         return <p className="pt-40 text-center">Loading room...</p>;
@@ -55,7 +54,7 @@ const RoomDetails = () => {
 
             //to check availability
             const availabilityRes = await fetch(
-                `${API_URL}/api/rooms/check/${id}?checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`
+                `api/rooms/check/${id}?checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`
             );
 
             const availabilityData = await availabilityRes.json();
@@ -82,7 +81,7 @@ const RoomDetails = () => {
 
             //create booking
             const bookingRes = await fetch(
-                `${API_URL}/api/bookings`,
+                `api/bookings`,
                 {
                     method: "POST",
                     headers: {

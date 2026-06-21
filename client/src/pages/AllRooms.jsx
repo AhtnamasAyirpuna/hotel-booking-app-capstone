@@ -13,15 +13,14 @@ const AllRooms = () => {
     const city = searchParams.get("city") || "all";
     const checkInDate = searchParams.get("checkInDate");
     const checkOutDate = searchParams.get("checkOutDate");
-    const API_URL = import.meta.env.VITE_API_URL || "";
 
     useEffect(() => {
         const fetchRooms = async () => {
             try {
-                let url = `${API_URL}/api/rooms`;
+                let url = `api/rooms`;
 
                 if (checkInDate && checkOutDate) {
-                    url = `${API_URL}/api/rooms/search?city=${city}&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`
+                    url = `api/rooms/search?city=${city}&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`
                 }
 
                 const res = await fetch(url);
@@ -36,7 +35,7 @@ const AllRooms = () => {
         };
 
         fetchRooms();
-    }, [API_URL, city, checkInDate, checkOutDate]);
+    }, [city, checkInDate, checkOutDate]);
 
     if (loading) {
         return <p className='pt-40 text-center'>Loading rooms...</p>

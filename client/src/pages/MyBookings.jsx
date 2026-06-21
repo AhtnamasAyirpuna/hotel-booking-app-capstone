@@ -8,7 +8,6 @@ const MyBookings = () => {
     const [editingBooking, setEditingBooking] = useState(null);
     const [newCheckIn, setNewCheckIn] = useState("");
     const [newCheckOut, setNewCheckOut] = useState("");
-    const API_URL = import.meta.env.VITE_API_URL || "";
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -24,7 +23,7 @@ const MyBookings = () => {
                 setLoading(true);
                 const token = await user.getIdToken();
 
-                const res = await fetch(`${API_URL}/api/bookings/my`, {
+                const res = await fetch(`api/bookings/my`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -47,7 +46,7 @@ const MyBookings = () => {
             }
         });
         return () => unsubscribe();
-    }, [API_URL]);
+    }, []);
 
     const handleCancel = async (bookingId) => {
         if (!window.confirm("Cancel this booking?")) return;
@@ -56,7 +55,7 @@ const MyBookings = () => {
             const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
 
-            await fetch(`${API_URL}/api/bookings/${bookingId}`, {
+            await fetch(`api/bookings/${bookingId}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -86,7 +85,7 @@ const MyBookings = () => {
                 return;
             }
 
-            const res = await fetch(`${API_URL}/api/bookings/${bookingId}`, {
+            const res = await fetch(`api/bookings/${bookingId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
