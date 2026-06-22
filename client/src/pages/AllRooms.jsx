@@ -17,10 +17,10 @@ const AllRooms = () => {
     useEffect(() => {
         const fetchRooms = async () => {
             try {
-                let url = `api/rooms`;
+                let url = `/api/rooms`;
 
                 if (checkInDate && checkOutDate) {
-                    url = `api/rooms/search?city=${city}&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`
+                    url = `/api/rooms/search?city=${city}&checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`
                 }
 
                 const res = await fetch(url);

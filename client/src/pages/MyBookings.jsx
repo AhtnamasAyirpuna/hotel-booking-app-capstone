@@ -23,7 +23,7 @@ const MyBookings = () => {
                 setLoading(true);
                 const token = await user.getIdToken();
 
-                const res = await fetch(`api/bookings/my`, {
+                const res = await fetch(`/api/bookings/my`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -55,7 +55,7 @@ const MyBookings = () => {
             const auth = getAuth();
             const token = await auth.currentUser.getIdToken();
 
-            await fetch(`api/bookings/${bookingId}`, {
+            await fetch(`/api/bookings/${bookingId}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -85,7 +85,7 @@ const MyBookings = () => {
                 return;
             }
 
-            const res = await fetch(`api/bookings/${bookingId}`, {
+            const res = await fetch(`/api/bookings/${bookingId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

@@ -16,7 +16,7 @@ const RoomDetails = () => {
     useEffect(() => {
         const fetchRoom = async () => {
             try {
-                const res = await fetch(`api/rooms/${id}`);
+                const res = await fetch(`/api/rooms/${id}`);
                 if (!res.ok) {
                     throw new Error("Room not found");
                 }
@@ -54,7 +54,7 @@ const RoomDetails = () => {
 
             //to check availability
             const availabilityRes = await fetch(
-                `api/rooms/check/${id}?checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`
+                `/api/rooms/check/${id}?checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`
             );
 
             const availabilityData = await availabilityRes.json();
@@ -81,7 +81,7 @@ const RoomDetails = () => {
 
             //create booking
             const bookingRes = await fetch(
-                `api/bookings`,
+                `/api/bookings`,
                 {
                     method: "POST",
                     headers: {

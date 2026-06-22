@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
                 console.log("TOKEN:", token);
 
                 const res = await fetch(
-                    `api/users/me`,
+                    `/api/users/me`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,

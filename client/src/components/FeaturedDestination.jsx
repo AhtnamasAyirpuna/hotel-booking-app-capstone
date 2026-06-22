@@ -10,7 +10,7 @@ const FeaturedDestination = () => {
     useEffect(() => {
         const fetchRooms = async () => {
             try {
-                const res = await fetch(`api/rooms`);
+                const res = await fetch(`/api/rooms`);
                 const data = await res.json();
                 setRooms(data.slice(0, 4));
             } catch (error) {
