@@ -63,7 +63,6 @@ export default function SignUpModal({ onClose, switchToLogin }) {
             setPassword("");
 
             onClose();
-            window.location.reload();
 
         } catch (err) {
             if (err.code === "auth/weak-password") {
