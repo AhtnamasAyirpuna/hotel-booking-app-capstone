@@ -27,6 +27,11 @@ export default function SignUpModal({ onClose, switchToLogin }) {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
+            //take out
+            console.log("SIGNUP UID:", user.uid);
+            console.log("SIGNUP EMAIL:", user.email);
+            //take out
+
             let imageUrl =
                 "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 

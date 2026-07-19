@@ -35,7 +35,6 @@ export function AuthProvider({ children }) {
 
                 console.log("USER DATA:", userData);
 
-                //delete
 
                 setCurrentUser({
                     uid: user.uid,
@@ -51,6 +50,11 @@ export function AuthProvider({ children }) {
             }
 
             setLoading(false);
+
+            //take out
+            console.log("AUTH UID:", user.uid);
+            console.log("AUTH EMAIL:", user.email);
+            //take out
         });
 
         return unsubscribe;

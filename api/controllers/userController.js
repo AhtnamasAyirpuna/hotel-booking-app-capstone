@@ -6,6 +6,9 @@ export const getMyProfile = async (req, res) => {
     try {
         const firebaseUid = req.user.uid;
 
+        //take out
+        console.log("PROFILE UID:", firebaseUid);
+
         const result = await pool.query(
             "SELECT * FROM users WHERE firebase_uid = $1",
             [firebaseUid]
@@ -30,6 +33,10 @@ export const getMyProfile = async (req, res) => {
 export const createUser = async (req, res) => {
     try {
         const firebaseUid = req.user.uid;
+
+        //take out
+        console.log("CREATE USER UID:", firebaseUid);
+        //take out
 
         const { email, profileImage } = req.body;
 
