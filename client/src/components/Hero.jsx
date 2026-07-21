@@ -63,7 +63,7 @@ const Hero = () => {
                         <img src={assets.calendar} alt="" className='h-4' />
                         <label htmlFor="checkOut">Check out</label>
                     </div>
-                    <input id="checkOut" name="checkOut" onChange={(e) => setCheckOutDate(e.target.value)} value={checkOutDate} id="checkOut" type="date" className=" rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none" />
+                    <input id="checkOut" name="checkOut" onChange={(e) => setCheckOutDate(e.target.value)} value={checkOutDate} type="date" className=" rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none" />
                 </div>
 
                 <button className='flex items-center justify-center gap-1 rounded-md bg-black py-3 px-4 text-white my-auto cursor-pointer max-md:w-full max-md:py-1' >
