@@ -1,5 +1,11 @@
 {
     "outputDirectory": "client/dist",
+    "functions": {
+        "api/index.js": {
+            "memory": 1024,
+            "maxDuration": 10
+        }
+    },
     "rewrites": [
         {
             "source": "/api/(.*)",
@@ -7,7 +13,7 @@
         },
         {
             "source": "/(.*)",
-            "destination": "/client/dist/index.html"
+            "destination": "/index.html"
         }
     ]
 }
