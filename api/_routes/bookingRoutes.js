@@ -1,6 +1,6 @@
 import express from "express";
-import { verifyToken } from "../middleware/authMiddleware.js";
-import { createBooking, getMyBookings, getBookingById, deleteBooking, checkRoomAvailability, updateBooking } from "../controllers/bookingController.js";
+import { verifyToken } from "../_middleware/authMiddleware.js";
+import { createBooking, getMyBookings, getBookingById, deleteBooking, checkRoomAvailability, updateBooking } from "../_controllers/bookingController.js";
 
 const router = express.Router();
 
