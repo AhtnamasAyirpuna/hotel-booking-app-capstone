@@ -1,5 +1,5 @@
 //Firestore logic
-import pool from "../config/db.js";
+import pool from "../_config/db.js";
 
 // GET /api/users/me
 export const getMyProfile = async (req, res) => {

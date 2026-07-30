@@ -1,10 +1,10 @@
-import "./config/env.js";
+import "./_config/env.js";
 
 import express from "express";
 import cors from "cors";
-import userRoutes from "./routes/userRoutes.js";
-import bookingRoutes from "./routes/bookingRoutes.js";
-import roomRoutes from "./routes/roomRoutes.js";
+import userRoutes from "./_routes/userRoutes.js";
+import bookingRoutes from "./_routes/bookingRoutes.js";
+import roomRoutes from "./_routes/roomRoutes.js";
 
 const app = express();
 

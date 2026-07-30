@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, storage } from "../firebase";
 import { createPortal } from "react-dom";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { assets } from "../assets";
+import { useAuth } from "../context/useAuth";
+
 
 export default function SignUpModal({ onClose, switchToLogin }) {
     const [email, setEmail] = useState("");
@@ -11,6 +13,8 @@ export default function SignUpModal({ onClose, switchToLogin }) {
     const [error, setError] = useState("");
     const [profileImage, setProfileImage] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    const { refreshUserProfile } = useAuth();
 
     const handleSignUp = async (e) => {
         e.preventDefault();
@@ -24,17 +28,13 @@ export default function SignUpModal({ onClose, switchToLogin }) {
         }
 
         try {
+            // 1. Create Firebase Auth user
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            //take out
-            console.log("SIGNUP UID:", user.uid);
-            console.log("SIGNUP EMAIL:", user.email);
-            //take out
+            let imageUrl = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
-            let imageUrl =
-                "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-
+            // 2. Upload image to Firebase Storage if selected
             if (profileImage) {
                 const imageRef = ref(
                     storage,
@@ -42,10 +42,15 @@ export default function SignUpModal({ onClose, switchToLogin }) {
                 );
 
                 await uploadBytes(imageRef, profileImage);
-
                 imageUrl = await getDownloadURL(imageRef);
             }
 
+            // 3. Update Firebase profile photoURL immediately
+            await updateProfile(user, {
+                photoURL: imageUrl,
+            });
+
+            // 4. Save user document in MongoDB
             const token = await user.getIdToken();
 
             const response = await fetch(`/api/users`, {
@@ -64,9 +69,13 @@ export default function SignUpModal({ onClose, switchToLogin }) {
                 throw new Error("Failed to save user profile");
             }
 
+            // 5. Trigger profile refresh in Auth Context
+            if (refreshUserProfile) {
+                await refreshUserProfile();
+            }
+
             setEmail("");
             setPassword("");
-
             onClose();
 
         } catch (err) {

@@ -1,4 +1,4 @@
-import pool from "../config/db.js";
+import pool from "../_config/db.js";
 
 export const createBooking = async (req, res) => {
     try {
