@@ -108,7 +108,7 @@ const RoomDetails = () => {
 
         } catch (error) {
             console.error(error);
-            alert("Error checking availability");
+            alert(error.message || "Error checking availability");
         } finally {
             setChecking(false);
         }
