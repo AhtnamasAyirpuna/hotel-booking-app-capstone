@@ -131,13 +131,13 @@ const RoomDetails = () => {
                 <div className='lg:w-1/2 w-full'>
                     <img src={mainImage || "https://placehold.co/600x400?text=No+Image"} alt="Room Image" onError={(e) => {
                         e.target.src = "https://placehold.co/600x400?text=Image+Unavailable";
-                    }} className='block w-full h-full max-h-[420px] min-h-[420px] rounded-xl shadow-lg object-cover' />
+                    }} className='block w-full aspect-[3/2] rounded-xl shadow-lg object-cover' />
                 </div>
                 {/*Thumbnail grid*/}
-                <div className='grid grid-cols-2 gap-4 lg:w-1/2 w-full h-[420px]'>
+                <div className='grid grid-cols-2 gap-4 lg:w-1/2 w-full'>
                     {room?.image.length > 1 &&
                         room.image.map((image, index) => (
-                            <div key={index} onClick={() => setMainImage(image)} className={`overflow-hidden rounded-xl cursor-pointer shadow-md border-2 transition-all duration-200
+                            <div key={index} onClick={() => setMainImage(image)} className={`aspect-[3/2] overflow-hidden rounded-xl cursor-pointer shadow-md border-2 transition-all duration-200
                                 ${mainImage === image ? "border-orange-500" : "border-transparent"}`}>
                                 <img src={image} alt="Room Image"
                                     onError={(e) => {
@@ -172,7 +172,7 @@ const RoomDetails = () => {
 
                     <div className='flex flex-col'>
                         <label htmlFor="checkInDate" className='font-medium'>Check-In</label>
-                        <input name="checkInDate" id="checkInDate" type="date" value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required />
+                        <input name="checkInDate" id="checkInDate" type="date" min={new Date().toISOString().split("T")[0]} value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} className='w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none' required />
                     </div>
                     <div className='w-px h-15 bg-gray-300/70 max-md:hidden'></div>
                     <div className='flex flex-col'>
