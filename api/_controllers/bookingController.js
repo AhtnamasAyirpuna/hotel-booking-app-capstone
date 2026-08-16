@@ -12,8 +12,17 @@ export const createBooking = async (req, res) => {
         const checkIn = new Date(checkInDate);
         const checkOut = new Date(checkOutDate);
 
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (checkIn < today) {
+            return res.status(400).json({
+                message: "Invalid date range"
+            });
+        }
+
         if (checkOut <= checkIn) {
-            return res.status(400).json({ message: "invalid date range" });
+            return res.status(400).json({ message: "Invalid date range" });
         }
 
         const roomResult = await pool.query(
@@ -182,7 +191,19 @@ export const checkRoomAvailability = async (req, res) => {
             });
         }
 
-        if (new Date(checkOutDate) <= new Date(checkInDate)) {
+        const checkIn = new Date(checkInDate);
+        const checkOut = new Date(checkOutDate);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (checkIn < today) {
+            return res.status(400).json({
+                message: "Invalid date range"
+            });
+        }
+
+        if (checkOut <= checkIn) {
             return res.status(400).json({
                 message: "Invalid date range"
             });
@@ -223,6 +244,15 @@ export const updateBooking = async (req, res) => {
 
         const checkIn = new Date(checkInDate);
         const checkOut = new Date(checkOutDate);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (checkIn < today) {
+            return res.status(400).json({
+                message: "Invalid date range"
+            });
+        }
 
         if (checkOut <= checkIn) {
             return res.status(400).json({
