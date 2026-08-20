@@ -13,9 +13,11 @@ app.use(cors()); //Enable Cross-Origin Resource Sharing
 app.use(express.json());
 
 app.use((req, res, next) => {
-    console.log(req.method, req.path);
+    console.log("Incoming request:", req.method, req.url, req.path);
     next();
 });
+
+const apiRouter = express.Router();
 
 // Routes
 app.use('/api/users', userRoutes)
@@ -26,6 +28,9 @@ app.use("/api/rooms", roomRoutes)
 app.get("/api/test", (req, res) => {
     res.json({ message: "API is working" });
 });
+
+app.use("/api", apiRouter);
+app.use("/", apiRouter);
 
 const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== "production") {
