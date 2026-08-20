@@ -49,6 +49,7 @@ export default function LoginModal({ onClose, switchToSignup }) {
                             className="w-full outline-none bg-transparent py-2.5"
                             type="email"
                             placeholder="Email"
+                            autoComplete="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -64,6 +65,7 @@ export default function LoginModal({ onClose, switchToSignup }) {
                             className="w-full outline-none bg-transparent py-2.5"
                             type="password"
                             placeholder="Password"
+                            autoComplete="current-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required

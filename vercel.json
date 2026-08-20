@@ -1,12 +1,18 @@
 {
     "outputDirectory": "client/dist",
+    "functions": {
+        "api/index.js": {
+            "memory": 1024,
+            "maxDuration": 10
+        }
+    },
     "rewrites": [
         {
-            "source": "/api/(.*)",
+            "source": "/api/:path*",
             "destination": "/api/index.js"
         },
         {
-            "source": "/(.*)",
+            "source": "/((?!api/).*)",
             "destination": "/index.html"
         }
     ]
